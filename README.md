@@ -1,2 +1,4 @@
-# SOR-Semáforos-1S-2021
+##       Sistemas operatuivos y redes ##
+#             Trabajo Practico   #
+###              "Semaforos"  ###
 Trabajo Práctico Semáforos primer semestre año 2021
