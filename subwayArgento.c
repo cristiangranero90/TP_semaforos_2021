@@ -5,9 +5,10 @@
 #include <semaphore.h>  // para usar semaforos
 #include <unistd.h>
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-
+//ANSI colores
+#define ANSI_COLOR_RED     "\x1b[31m" 
+#define ANSI_COLOR_GREEN   "\x1b[32m" 
+//reseteo
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #define LIMITE 50
@@ -16,6 +17,8 @@ pthread_mutex_t salero = PTHREAD_MUTEX_INITIALIZER; //salero
 
 pthread_mutex_t pan = PTHREAD_MUTEX_INITIALIZER; //horno de pan
 
+pthread_mutex_t sarten = PTHREAD_MUTEX_INITIALIZER; //Mutex de sarten
+
 int panes = 0; // cantidad de panes
 
 
@@ -23,6 +26,10 @@ int panes = 0; // cantidad de panes
 struct semaforos {
     sem_t sem_mezclar;
     sem_t sem_salar;
+    sem_t sem_pan;
+    sem_t sem_verduras;
+    sem_t sem_cocinar;
+    sem_t sem_armar;
 
 
 	//poner demas semaforos aqui
@@ -89,6 +96,45 @@ void* cortar(void *data) {
     pthread_exit(NULL);
 }
 
+void* cocinarMilanesa(void *data){
+
+	char *accion = "cocinar milanesa";
+
+	struct parametro *mydata = data;
+
+	sem_wait(&mydata->semaforos_param.sem_cocinar);
+
+	pthread_mutex_lock(&sarten);
+
+	printf(ANSI_COLOR_RED "Equipo: %d cocinando la milanesa!!!! \n" ANSI_COLOR_RESET, mydata->equipo_param);
+
+	usleep(60000);
+
+	pthread_mutex_unlock(&sarten);
+
+	pthread_exit(NULL);
+
+
+	
+}
+
+void* cortarVerduras(void *data){ //Terminar verduras, revisar
+
+	char *accion = "cortar verduras";
+
+	struct parametro *mydata = data;
+
+	imprimirAccion(mydata, accion);
+
+	usleep(60000);
+
+	sem_post(&mydata->semaforos_param.sem_verduras); //Listo verduras
+
+	pthread_exit(NULL);
+}
+
+
+
 void* cocinarPan(void *data){ //Terminar el pan
 
 	//char *accion = "cocinar_pan";
@@ -131,6 +177,9 @@ void* cocinarPan(void *data){ //Terminar el pan
 
 		//pthread_exit(NULL);
 	}
+
+	sem_post(&mydata->semaforos_param.sem_pan);
+
 
 	pthread_exit(NULL);
 
@@ -179,6 +228,10 @@ void* salar (void *data){
 
 
 	sem_post(&mydata->semaforos_param.sem_salar);
+	
+	sem_post(&mydata->semaforos_param.sem_cocinar); //habilita cocinar
+
+
 
 	//sem_post(&mydata->semaforos_param.sem_mezclar);
 
@@ -193,12 +246,23 @@ void* ejecutarReceta(void *i) {
 	//crear variables semaforos aqui
 	sem_t sem_salar;
 
+	sem_t sem_pan;
+
+	sem_t sem_verduras;
+
+	sem_t sem_cocinar;
+
+	sem_t sem_armar;
+
 	
 	//variables hilos
 	pthread_t p1; 
 	pthread_t p2;
 	pthread_t p3;
 	pthread_t p4;
+	pthread_t p5; //cortarVerduras
+	pthread_t p6; //cocinar milanga
+
 	//crear variables hilos aqui
 	
 	//numero del equipo (casteo el puntero a un int)
@@ -218,6 +282,13 @@ void* ejecutarReceta(void *i) {
 	pthread_data->semaforos_param.sem_mezclar = sem_mezclar;
 	//setear demas semaforos al struct aqui
 	pthread_data->semaforos_param.sem_salar = sem_salar;
+
+		pthread_data->semaforos_param.sem_pan = sem_pan;
+			pthread_data->semaforos_param.sem_verduras = sem_verduras;
+				pthread_data->semaforos_param.sem_cocinar = sem_cocinar;
+								pthread_data->semaforos_param.sem_armar = sem_armar;
+
+
 	
 //	pthread_data->semaforos_param.salero = salero;
 
@@ -237,6 +308,17 @@ void* ejecutarReceta(void *i) {
 	   strcpy(pthread_data->pasos_param[2].ingredientes[0], "sal");
 	   strcpy(pthread_data->pasos_param[2].ingredientes[1], "carne");
 	   strcpy(pthread_data->pasos_param[2].ingredientes[2], "pan rallado");
+
+	   strcpy(pthread_data->pasos_param[3].accion, "cortar verduras");
+	   strcpy(pthread_data->pasos_param[3].ingredientes[0], "lechuga");
+	   strcpy(pthread_data->pasos_param[3].ingredientes[1], "pepinos");
+	   strcpy(pthread_data->pasos_param[3].ingredientes[2], "tomate");
+	   strcpy(pthread_data->pasos_param[3].ingredientes[3], "cebolla morada");
+
+	   //strcpy(pthread_data->pasos_param[4].accion, "cocinar milanesa");
+
+
+
 	
 	
 	//inicializo los semaforos
@@ -244,6 +326,12 @@ void* ejecutarReceta(void *i) {
 	sem_init(&(pthread_data->semaforos_param.sem_mezclar),0,0);
 	//inicializar demas semaforos aqui
 	sem_init(&(pthread_data->semaforos_param.sem_salar), 0, 0);
+
+	sem_init(&(pthread_data->semaforos_param.sem_pan), 0, 0);
+	sem_init(&(pthread_data->semaforos_param.sem_verduras), 0, 0);
+	sem_init(&(pthread_data->semaforos_param.sem_cocinar), 0, 0);
+	sem_init(&(pthread_data->semaforos_param.sem_armar), 0, 0);
+
 
 
 
@@ -273,6 +361,18 @@ void* ejecutarReceta(void *i) {
                                 cocinarPan,             //funcion a ejecutar
                                 pthread_data);                     //parametros de la funcion a ejecutar, pasado por referencia
 	//crear demas hilos aqui
+
+	rc = pthread_create(&p5,                           //identificador unico
+                            NULL,                          //atributos del thread
+                                cortarVerduras,             //funcion a ejecutar
+                                pthread_data);                     //parametros de la funcion a ejecutar, pasado por referencia
+	//crear demas hilos aqui
+
+	rc = pthread_create(&p6,                           //identificador unico
+                            NULL,                          //atributos del thread
+                                cocinarMilanesa,             //funcion a ejecutar
+                                pthread_data);                     //parametros de la funcion a ejecutar, pasado por referencia
+	//crear demas hilos aqui
 	
 	
 	//join de todos los hilos
@@ -281,6 +381,9 @@ void* ejecutarReceta(void *i) {
 	pthread_join (p2, NULL);
 	pthread_join (p3, NULL);
 	pthread_join (p4, NULL);
+	pthread_join (p5, NULL);
+	pthread_join (p6, NULL);
+
 
 
 	//valido que el hilo se alla creado bien 
@@ -294,6 +397,15 @@ void* ejecutarReceta(void *i) {
 	sem_destroy(&sem_mezclar);
 	//destruir demas semaforos 
 	sem_destroy(&sem_salar);
+
+	sem_destroy(&sem_pan);
+
+	sem_destroy(&sem_cocinar);
+
+	sem_destroy(&sem_pan);
+
+	sem_destroy(&sem_verduras);
+
 	
 	//salida del hilo
 	 pthread_exit(NULL);
