@@ -1,3 +1,5 @@
+![Universidad Nacional de General Sarmiento](https://github.com/cristiangranero90/TP_semaforos_2021/edit/main/UNGS.jpeg)
+
 ## Sistemas operativos y redes I ##
 # Trabajo Practico 3, año 2021 #
 ### "Threads y Semaforos"  ###
