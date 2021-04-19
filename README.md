@@ -2,6 +2,6 @@
 # Trabajo Practico   #
 ### "Threads y Semaforos"  ###
 
-###Alumno: Cristian Granero ###
+### Alumno: Cristian Granero ###
 
 Trabajo Práctico Semáforos primer semestre año 2021
