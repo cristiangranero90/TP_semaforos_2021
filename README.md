@@ -92,6 +92,10 @@ Para ejecutar:
 ./ejec
 ```
 
+**Tener en cuenta:** en algunas ejecuciones, puede producirse el error _Violación de segmento_, esto es debido a una falla en la lectura de un archivo, el cual se agrega a un arreglo. Por desgracia, y sabiendo que no es una falla recurrente, no se ha podido determinar ni solucionar el inconveniente.
+
+
+
 
 
 
