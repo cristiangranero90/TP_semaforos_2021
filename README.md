@@ -47,7 +47,7 @@ Semaforos empleados:
     sem_t sem_verduras; //Cortadas las verduras, habilita a armar
     sem_t sem_cocinar; //Habilita a armar
     sem_t sem_armar; //Si todas las acciones, fueron realizadas entonces se puede armar el sandwich. Habilita a listo
-    sem_t sem_listo; //Una vez todo finalizado, se podra entre otras cosas seleccionar al ganador
+    sem_t sem_listo; //Una vez que todo ha finalizado, se podra entre otras cosas seleccionar al ganador
     
     //Por otra parte los mutex
     
@@ -64,7 +64,38 @@ El programa generara dos salidas, en primera instancia se mostrará por pantalla
 
 En segunda instancia, todos los pasos mostrados anteriormente, serán guardados en un archivo, en este caso sera el archivo _"ejecucion.txt"_. En este archivo sin embargo, no se guardaran los datos en color, ya que no pueden ser procesados.
   
-En ambos casos, al final se mostrará al *ganador* de la competencia.
+En ambos casos, al final se mostrará al **ganador** de la competencia.
+
+***Conclusiones***
+
+Si bien, el programa propuesto requirió de determinado tiempo, se logró sincronizar todas las acciones con éxito. Esta solución, sin embargo, no debe considerarse como única. Puesto a que hay muchas soluciones viables.
+Además, en este programa se utilizó, lectura y escritura de datos en archivos, y *prints* con colores en la consola, tener en cuenta que sólo será viable en equipos que ejecuten Linux. 
+
+***Otras aclaraciones***
+
+En esta sección se desea ser lo mas claro posible con los archivos provistos en el repositorio.
+
+- **subwayArgento.c**, es el archivo fuente de la competencia.
+- **pruebaLectura.c**, archivo fuente con una muestra de lectura de archivos, utilizando *structs* y *arrays*.
+- **receta.txt**, contiene todos los pasos a seguir en la receta.
+- **ejecuccion.txt**, contiene todos los pasos realizados por cada equipo y por último al ganador de la competencia.
+- **hola2.txt**, archivo de prueba para pruebaLectura.c.
+
+Para compilar: 
+
+```bash
+gcc subwayArgento.c -o ejec -pthread
+```
+Para ejecutar:
+
+```bash
+./ejec
+```
+
+
+
+
+
 
   
 
