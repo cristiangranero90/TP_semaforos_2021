@@ -1,5 +1,5 @@
 ## Sistemas operativos y redes I ##
-# Trabajo Practico año 2021 #
+# Trabajo Practico 3, año 2021 #
 ### "Threads y Semaforos"  ###
 
 ### Alumno: Cristian Granero ###
@@ -58,7 +58,9 @@ Semaforos empleados:
 
 ***Salida***
 
-El programa generara dos salidas, en primera instancia se mostraran 
+El programa generara dos salidas, en primera instancia se mostrará por pantalla las acciones que van realizando los equipos independientemente. Un ejemplo de ello es, "Equipo 1, cocinando pan". Nótese, que en la salida todas las secciones criticas seran mostradas por pantalla en color rojo. Otras acciones, como "Equipo 2, se lleva el ultimo pan", se mostraran en verde, indicando, de alguna manera, que en la proxima habrá que cocinar más pan. Y por último aquellas acciones, básicas, se mostrarán en color blanco.
+
+En segunda instancia, todos los pasos mostrados anteriormente, serán guardados en un archivo, en este caso sera el archivo _"ejecucion.txt"_. En este archivo sin embargo, no se guardaran los datos en color, ya que no pueden ser procesados.
   
 
   
