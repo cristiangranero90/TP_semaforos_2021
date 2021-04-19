@@ -6,6 +6,11 @@
 
 ### Alumno: Cristian Granero ###
 
+### Comisión: 1 ###
+
+
+
+
 ***Introducción***
 
 El siguiente trabajo practico tiene como objetivo la implementacion y la sincronizacion de semaforos e hilos. A partir de ello, se propone una simulacion de una competencia de cocinar sandwichs de milanesa.
