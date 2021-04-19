@@ -21,7 +21,19 @@ Para comprender mejor esta solución, resulta importante mostrar cada una de las
 5. __Cortar verduras__, verduras frescas tales como lechuga y tomate son imprescindibles para un sandwich.
 6. __Cocinar milanesa__, cocinara la milanesa en aceite caliente, sin embargo tener en cuenta que solo hay un sartén disponible.
 7. __Preparar sandwich__, como ya se han realizado todos los pasos anteriores, solo queda armar el sandwich.
-8. __Seleccionar al ganador__, por último, y no por ello menos importante, debemos seleccionar al equipo ganador.
+8. __Seleccionar al ganador__, por último, y no por ello menos importante, se debe seleccionar al equipo ganador.
+
+```c
+void cortar();
+void mezclar();
+void empanar();
+void cocinarPan();
+void cortarVerduras();
+void cocinarMilanesa();
+void prepararSandwich();
+void seleccionarGanador();
+```
+
 
   
 
