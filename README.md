@@ -8,6 +8,8 @@
 
 ### Comisión: 1 noche ###
 
+### Profesores: Mariano Vargas, Noelia Sosa, Ignacio Tula ###
+
 
 
 
