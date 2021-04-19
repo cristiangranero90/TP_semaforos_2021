@@ -23,6 +23,8 @@ Para comprender mejor esta solución, resulta importante mostrar cada una de las
 7. __Preparar sandwich__, como ya se han realizado todos los pasos anteriores, solo queda armar el sandwich.
 8. __Seleccionar al ganador__, por último, y no por ello menos importante, se debe seleccionar al equipo ganador.
 
+_En el codigo:_
+
 ```c
 void cortar();
 void mezclar();
