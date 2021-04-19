@@ -1,0 +1,39 @@
+accion
+cortar
+ingredientes
+ajo
+perejil
+accion
+mezclar
+ingredientes
+carne
+huevo
+accion
+empanar
+ingredientes
+sal
+carne
+pan rallado
+accion
+cortar verduras
+ingredientes
+lechuga
+pepinos
+tomate
+cebolla morada
+accion
+preparar sandwich
+ingredientes
+milanesa
+verduras frescas
+pan caliente
+accion
+cocinar milanesa
+ingredientes
+aceite caliente
+sarten
+accion
+cocinar pan
+ingredientes
+pan
+

@@ -21,7 +21,9 @@ pthread_mutex_t sarten = PTHREAD_MUTEX_INITIALIZER; //Mutex de sarten
 
 pthread_mutex_t listo1 = PTHREAD_MUTEX_INITIALIZER; //Para saber si esta listo 
 
-pthread_mutex_t escribir = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t escribir = PTHREAD_MUTEX_INITIALIZER; //Para escribir sobre ejecucion
+
+//pthread_mutex_t m_lectura = PTHREAD_MUTEX_INITIALIZER; //Para leer la receta
 
 int panes = 0; // cantidad de panes
 
@@ -34,6 +36,7 @@ FILE* receta;
 
 //creo estructura de semaforos 
 struct semaforos {
+
     sem_t sem_mezclar;
     sem_t sem_salar;
     sem_t sem_pan;
@@ -123,7 +126,7 @@ void* imprimirAccion(void *data, char *accionIn) {
 //funcion para tomar de ejemplo
 void* cortar(void *data) {
 	//creo el nombre de la accion de la funcion 
-	char *accion = "cortar";
+	char *accion = "cortar\n";
 	//creo el puntero para pasarle la referencia de memoria (data) del struct pasado por parametro (la cual es un puntero). 
 	struct parametro *mydata = data;
 	//llamo a la funcion imprimir le paso el struct y la accion de la funcion
@@ -157,9 +160,11 @@ void* guardaGanador(void *data){
 
 void* prepararSandwich(void *data){
 
-	char *accion = "preparar sandwich";
+	char *accion = "preparar sandwich\n";
 
 	struct parametro *mydata = data;
+
+	//Semaforos necesarios para la accion
 
 	sem_wait(&mydata->semaforos_param.sem_verduras);
 
@@ -167,9 +172,23 @@ void* prepararSandwich(void *data){
 
 	sem_wait(&mydata->semaforos_param.sem_armar);
 
-	//imprimirAccion(mydata, accion);
+	imprimirAccion(mydata, accion);
+
+	//escritura en el archivo
+
+	pthread_mutex_lock(&escribir);
+
+	ejecucion = fopen("ejecucion.txt", "a");
 
 	printf("Equipo: %d preparando sandwich!\n", mydata->equipo_param);
+
+	fprintf(ejecucion, "Equipo: %d preparando sandwich!\n", mydata->equipo_param);
+
+	fclose(ejecucion);
+
+	pthread_mutex_unlock(&escribir);
+
+	//cierre
 
 	usleep(60000);
 
@@ -181,15 +200,28 @@ void* prepararSandwich(void *data){
 
 void* cocinarMilanesa(void *data){
 
-	char *accion = "cocinar milanesa";
+	char *accion = "cocinar milanesa\n";
 
 	struct parametro *mydata = data;
 
+	//semaforo necesario
 	sem_wait(&mydata->semaforos_param.sem_cocinar);
 
 	pthread_mutex_lock(&sarten);
 
+	imprimirAccion(mydata, accion);
+
+	pthread_mutex_lock(&escribir);
+
+	ejecucion = fopen("ejecucion.txt", "a");
+
+	fprintf(ejecucion, "Equipo: %d cocinando la milanesa!!!! \n", mydata->equipo_param);
+
 	printf(ANSI_COLOR_RED "Equipo: %d cocinando la milanesa!!!! \n" ANSI_COLOR_RESET, mydata->equipo_param);
+
+	fclose(ejecucion);
+
+	pthread_mutex_unlock(&escribir);
 
 	usleep(600000);
 
@@ -203,7 +235,7 @@ void* cocinarMilanesa(void *data){
 
 void* cortarVerduras(void *data){ //Terminar verduras, revisar
 
-	char *accion = "cortar verduras";
+	char *accion = "cortar verduras\n";
 
 	struct parametro *mydata = data;
 
@@ -220,17 +252,31 @@ void* cortarVerduras(void *data){ //Terminar verduras, revisar
 
 void* cocinarPan(void *data){ //Terminar el pan
 
-	//char *accion = "cocinar_pan";
+	char *accion = "cocinar pan\n";
 
 	struct parametro *mydata = data;
+
+	imprimirAccion(mydata, accion);
 
 	if (panes == 0){
 
 		pthread_mutex_lock(&pan);
 
 		printf("  \n"); //Espacio
-	
+
+		pthread_mutex_lock(&escribir);
+
+		ejecucion = fopen("ejecucion.txt", "a");
+
 		printf(ANSI_COLOR_RED "Equipo: %d cocinando panes.\n" ANSI_COLOR_RESET, mydata->equipo_param);
+
+		fprintf(ejecucion, "\nEquipo: %d cocinando panes.\n" , mydata->equipo_param);
+
+		fprintf(ejecucion, "Equipo: %d se lleva un pan recien horneado!. \n", mydata->equipo_param);
+
+		fclose(ejecucion);
+
+		pthread_mutex_unlock(&escribir);
 
 		printf("  \n"); //Espacio
 
@@ -242,13 +288,23 @@ void* cocinarPan(void *data){ //Terminar el pan
 
 	else{
 
-		panes = 0;
+		panes = 0;		
+
+		pthread_mutex_lock(&escribir);
+
+		ejecucion = fopen("ejecucion.txt", "a");
+
+		fprintf(ejecucion, "Equipo %d, se lleva el ultimo pan horneado :D!\n", mydata->equipo_param);
 
 		printf("  \n"); //Espacio
 
 		printf(ANSI_COLOR_GREEN "Equipo %d, se lleva el ultimo pan horneado :D!\n" ANSI_COLOR_RESET, mydata->equipo_param);
 
 		printf("  \n"); //Espacio
+
+		fclose(ejecucion);
+
+		pthread_mutex_unlock(&escribir);
 
 		usleep(200000);
 
@@ -264,7 +320,7 @@ void* cocinarPan(void *data){ //Terminar el pan
 
 void* mezclar(void *data){
 
-	char *accion = "mezclar";
+	char *accion = "mezclar\n";
 
 	struct parametro *mydata = data;
 
@@ -283,7 +339,7 @@ void* mezclar(void *data){
 
 void* salar (void *data){
 
-	char *accion = "empanar";
+	char *accion = "empanar\n";
 
 	struct parametro *mydata = data;
 
@@ -291,11 +347,21 @@ void* salar (void *data){
 
 	pthread_mutex_lock(&salero);
 
+	pthread_mutex_lock(&escribir);
+
+	ejecucion = fopen("ejecucion.txt", "a");
+
+	fprintf(ejecucion, "Equipo %d, usando el salero!\n", mydata->equipo_param);
+
 	printf("  \n"); //Espacio
 
-	printf("Equipo %d, usando el salero!\n", mydata->equipo_param);
+	printf(ANSI_COLOR_RED "Equipo %d, usando el salero!\n" ANSI_COLOR_RESET, mydata->equipo_param);
 
 	printf("  \n"); //Espacio
+
+	fclose(ejecucion);
+
+	pthread_mutex_unlock(&escribir);
 
 	imprimirAccion(mydata, accion);
 
@@ -309,6 +375,64 @@ void* salar (void *data){
 	sem_post(&mydata->semaforos_param.sem_cocinar); //habilita cocinar
 
 	pthread_exit(NULL);
+}
+
+void* cargarReceta(void *data){
+
+	struct parametro *mydata = data;
+
+	receta = fopen("receta.txt", "r");
+
+	if (receta == NULL){
+
+		printf("Error al abrir la receta. \n");
+
+	}
+
+	int caracteres = 50;
+
+	int contAccion;
+
+	int contIngredientes;
+
+	char palabra[caracteres];
+
+	fgets(palabra, caracteres, receta);
+
+	while(feof(receta) == 0){
+
+		contIngredientes = 0;
+
+		if(strcmp(palabra, "accion\n") == 0){
+
+			fgets(palabra, caracteres, receta);
+
+			strcpy((mydata->pasos_param[contAccion].accion), palabra);
+
+			fgets(palabra, caracteres, receta);
+
+		}
+
+		else if (strcmp(palabra, "ingredientes\n") == 0){
+
+			fgets(palabra, caracteres, receta);
+
+			while(strcmp(palabra, "ingredientes\n") != 0  && strcmp(palabra, "accion\n") != 0 && feof(receta) == 0){
+
+				strcpy((mydata->pasos_param[contAccion].ingredientes[contIngredientes]), palabra);
+
+				fgets(palabra, caracteres, receta);
+
+				contIngredientes++;
+
+			}
+
+			contAccion++;
+		}
+
+	}
+
+	fclose(receta);
 }
 
 
@@ -331,10 +455,11 @@ void* ejecutarReceta(void *i) {
 
 	
 	//variables hilos
-	pthread_t p1; 
-	pthread_t p2;
-	pthread_t p3;
-	pthread_t p4;
+	pthread_t p0; //cargar receta
+	pthread_t p1; //cortar
+	pthread_t p2; //mezclar
+	pthread_t p3; //salar y empanar
+	pthread_t p4; //cocinar pan
 	pthread_t p5; //cortarVerduras
 	pthread_t p6; //cocinar milanga
 	pthread_t p7; //preparar sandwich
@@ -371,27 +496,10 @@ void* ejecutarReceta(void *i) {
 									pthread_data->semaforos_param.sem_listo = sem_listo;
 
 	//seteo las acciones y los ingredientes (Faltan acciones e ingredientes) ¿Se ve hardcodeado no? ¿Les parece bien?
-     	strcpy(pthread_data->pasos_param[0].accion, "cortar");
-	    strcpy(pthread_data->pasos_param[0].ingredientes[0], "ajo");
-      strcpy(pthread_data->pasos_param[0].ingredientes[1], "perejil");
+     	//cargarReceta(pthread_data);
 
-
-	    strcpy(pthread_data->pasos_param[1].accion, "mezclar");
-	    strcpy(pthread_data->pasos_param[1].ingredientes[0], "ajo");
-      strcpy(pthread_data->pasos_param[1].ingredientes[1], "perejil");
- 	    strcpy(pthread_data->pasos_param[1].ingredientes[2], "huevo");
-	    strcpy(pthread_data->pasos_param[1].ingredientes[3], "carne");
-
-	   strcpy(pthread_data->pasos_param[2].accion, "empanar");
-	   strcpy(pthread_data->pasos_param[2].ingredientes[0], "sal");
-	   strcpy(pthread_data->pasos_param[2].ingredientes[1], "carne");
-	   strcpy(pthread_data->pasos_param[2].ingredientes[2], "pan rallado");
-
-	   strcpy(pthread_data->pasos_param[3].accion, "cortar verduras");
-	   strcpy(pthread_data->pasos_param[3].ingredientes[0], "lechuga");
-	   strcpy(pthread_data->pasos_param[3].ingredientes[1], "pepinos");
-	   strcpy(pthread_data->pasos_param[3].ingredientes[2], "tomate");
-	   strcpy(pthread_data->pasos_param[3].ingredientes[3], "cebolla morada");
+     	//printf(" %s \n", pthread_data->pasos_param[0].accion );
+     	//printf(" %s \n", pthread_data->pasos_param[0].ingredientes[0]);
 
 	   //strcpy(pthread_data->pasos_param[4].accion, "cocinar milanesa");
 
@@ -417,6 +525,12 @@ void* ejecutarReceta(void *i) {
 
 	//creo los hilos a todos les paso el struct creado (el mismo a todos los hilos) ya que todos comparten los semaforos 
     int rc;
+    rc = pthread_create(&p0,                           //identificador unico
+                            NULL,                          //atributos del thread
+                                cargarReceta,             //funcion a ejecutar
+                                pthread_data);                     //parametros de la funcion a ejecutar, pasado por referencia
+	//crear demas hilos aqui
+
     rc = pthread_create(&p1,                           //identificador unico
                             NULL,                          //atributos del thread
                                 cortar,             //funcion a ejecutar
@@ -467,6 +581,7 @@ void* ejecutarReceta(void *i) {
 	
 	
 	//join de todos los hilos
+	pthread_join (p0,NULL);
 	pthread_join (p1,NULL);
 	//crear join de demas hilos
 	pthread_join (p2, NULL);
@@ -568,6 +683,16 @@ int main ()
 	
 	//Imprime al ganador	
 	printf(ANSI_COLOR_GREEN "EL GANADOR ES EL EQUIPO:  %d !!! FELICIDADES \n" ANSI_COLOR_RESET, ganador);
+
+	pthread_mutex_lock(&escribir);
+
+	ejecucion = fopen("ejecucion.txt", "a");
+
+	fprintf(ejecucion, "EL GANADOR ES EL EQUIPO:  %d !!! FELICIDADES \n", ganador);
+
+	fclose(ejecucion);
+
+	pthread_mutex_unlock(&escribir);
 
     pthread_exit(NULL);
 }

@@ -1,0 +1,12 @@
+accion
+cocinar
+ingredientes
+ajo
+perejil
+otro
+accion
+limpiar
+ingredientes
+uno
+dos
+tres
