@@ -35,6 +35,26 @@ void cocinarMilanesa();
 void prepararSandwich();
 void seleccionarGanador();
 ```
+Por otra parte, se emplean semaforos para sincronizar las acciones. Esto es debido a que la mayoria de las acciones requieren de algun paso previo. Es decir, no se podría cocinar una milanesa sin antes haberla empanado.
+Semaforos empleados:
+
+```c
+    sem_t sem_mezclar; //Habilita a salar
+    sem_t sem_salar; //Salar y empanar, habilita a cocinar
+    sem_t sem_pan; //Habilita a armar
+    sem_t sem_verduras; //Cortadas las verduras, habilita a armar
+    sem_t sem_cocinar; //Habilita a armar
+    sem_t sem_armar; //Si todas las acciones, fueron realizadas entonces se puede armar el sandwich. Habilita a listo
+    sem_t sem_listo; //Una vez todo finalizado, se podra entre otras cosas seleccionar al ganador
+    
+    //Por otra parte los mutex
+    
+    pthread_mutex_t salero = PTHREAD_MUTEX_INITIALIZER; //Para conocer si el salero esta en uso
+
+    pthread_mutex_t pan = PTHREAD_MUTEX_INITIALIZER; //Para conocer si algun equipo esta cocinando pan
+
+    pthread_mutex_t sarten = PTHREAD_MUTEX_INITIALIZER; //Al momento de cocinar, se requiere que la sarten no este en uso
+```
 
 
   
