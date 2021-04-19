@@ -64,6 +64,7 @@ El programa generara dos salidas, en primera instancia se mostrará por pantalla
 
 En segunda instancia, todos los pasos mostrados anteriormente, serán guardados en un archivo, en este caso sera el archivo _"ejecucion.txt"_. En este archivo sin embargo, no se guardaran los datos en color, ya que no pueden ser procesados.
   
+En ambos casos, al final se mostrará al *ganador* de la competencia.
 
   
 
