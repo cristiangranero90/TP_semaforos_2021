@@ -56,7 +56,9 @@ Semaforos empleados:
     pthread_mutex_t sarten = PTHREAD_MUTEX_INITIALIZER; //Al momento de cocinar, se requiere que la sarten no este en uso
 ```
 
+***Salida***
 
+El programa generara dos salidas, en primera instancia se mostraran 
   
 
   
